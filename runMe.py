@@ -11,7 +11,7 @@ leagues = ['EPL','La_Liga','Bundesliga','Serie_A','Ligue_1']#,'RFPL']
 gamesBackToCheck = 5
 #WHen win rate per xg difference is calculated, 
 # only include differences that have at least this many games to avoid skewing the data with small sample sizes
-minimumGamesToInclude = 50
+minimumGamesToInclude = 200
 seasons = ['2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025']
 xGExtraDigits = 1
 
@@ -24,7 +24,7 @@ def getUnderstatResults(league,year):
             f.write(json.dumps(games))
 
 def getLastGamesXGs(team:any,nGames:int,results,date=None):
-    games = [g for g in results if g['h']['id'] == team['id'] or g['a']['id'] == team['id']][:nGames]
+    games = [g for g in results if g['h']['id'] == team or g['a']['id'] == team][:nGames]
     
     if(len(games) < nGames):
         return 'not enough games'
@@ -32,11 +32,11 @@ def getLastGamesXGs(team:any,nGames:int,results,date=None):
     xG = 0
     xGA = 0
     for g in games:
-        if(g['h']['id'] == team['id']):
+        if(g['h']['id'] == team):
             #print(g['xG']['h'])
             xG += float(g['xG']['h'])
             xGA += float(g['xG']['a'])
-        if(g['a']['id'] == team['id']):
+        if(g['a']['id'] == team):
             xG += float(g['xG']['a'])
             xGA += float(g['xG']['h'])
     return [xG/len(games),xGA/len(games)]
@@ -72,8 +72,8 @@ def processPastGames():
                     # so we only get games that happened before the current game
                     priorResults = results[:index]
 
-                    xGHome = getLastGamesXGs(homeTeam,gamesBackToCheck,priorResults)
-                    xGAway = getLastGamesXGs(awayTeam,gamesBackToCheck,priorResults)
+                    xGHome = getLastGamesXGs(homeTeam['id'],gamesBackToCheck,priorResults)
+                    xGAway = getLastGamesXGs(awayTeam['id'],gamesBackToCheck,priorResults)
                     if(xGHome != 'not enough games' and xGAway != 'not enough games'):
                         HxGDiff = round((xGHome[0] - xGHome[1]) - (xGAway[0] - xGAway[1]), xGExtraDigits)
                         AxGDiff = round((xGAway[0] - xGAway[1]) - (xGHome[0] - xGHome[1]), xGExtraDigits)
@@ -146,18 +146,20 @@ def analyzeData():
             games = len(e[1])
             e[1] = winRate
             e[2] = games
+            #print("xG Diff:",e[0],"Win Rate:",round(winRate,2),"Games:",games)
 
         for e in homeEntries:
             winRate = sum(e[1])/len(e[1]) if len(e[1]) > 0 else 0
             games = len(e[1])
             e[1] = winRate
             e[2] = games
+            #print("Home xG Diff:",e[0],"Win Rate:",round(winRate,2),"Games:",games)
         for e in awayEntries:
             winRate = sum(e[1])/len(e[1]) if len(e[1]) > 0 else 0
             games = len(e[1])   
             e[1] = winRate
             e[2] = games
-            print("xG Diff:",e[0],"Win Rate:",round(winRate,2),"Games:",games)
+            #print("Away xG Diff:",e[0],"Win Rate:",round(winRate,2),"Games:",games)
         
         totalGames = sum(e[2] for e in entries)
         print("Total games included in analysis:",totalGames)
