@@ -39,12 +39,15 @@ def getLastGamesXGs(team:any,nGames:int,results,date=None):
         if(g['a']['id'] == team):
             xG += float(g['xG']['a'])
             xGA += float(g['xG']['h'])
+        
     return [xG/len(games),xGA/len(games)]
 
 def calcWinOdds(xGSum,m,b):
     odds = (xGSum  * m) + b
     if odds <= 0:
-        return 0
+        return 0.05
+    if odds >= 1:
+        return 0.85
     return round(odds,2)
 
 def getData(leagues,seasons):

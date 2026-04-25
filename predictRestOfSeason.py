@@ -11,7 +11,7 @@ def predictRestOfSeason(league, season):
         #order results by date
         games = sorted(games['dates'], key=lambda x: x['datetime'])
         #only keep results where isResult is true
-        results = [i for i in games if i['isResult'] == True]
+        results = [i for i in games if i['isResult'] == True][::-1]     
         remainingGames = [i for i in games if i['isResult'] == False]
 
     with open(f'settings.json', 'r') as f:
@@ -28,7 +28,9 @@ def predictRestOfSeason(league, season):
     for team in teams:
         #print(f"Calculating last 5 games xG for {team['title']}")
         team['lastXGs'] = getLastGamesXGs(team['id'], 5, results)
+        
         team['lastXGs'] = team['lastXGs'][0] - team['lastXGs'][1]
+        
         team['pts'] = 0
 
 
@@ -92,7 +94,7 @@ def simulateRestOfSeason(remainingGames, teams):
 
     
     #return teams ordered by points
-    #teams = sorted(teams, key=lambda x: x['pts'], reverse=True)
+    teams = sorted(teams, key=lambda x: x['pts'], reverse=True)
 
     return teams
 
@@ -115,8 +117,9 @@ if __name__ == "__main__":
             
             for i in range(numberOfSimulations):
                 res = simulateRestOfSeason(remainingGames, copy.deepcopy(teams))
+            
                 for index, team in enumerate(res, start=1):
-                    #print(f"Simulation {i+1}: {team['title']} finished in position {index}")
+                    #print(f"Simulation {i+1}: {team['title']} finished in position {index} with {team['pts']} points")
                     teamPositionsAtEndOfSeason[team['short_title']][index] += 1
 
 
