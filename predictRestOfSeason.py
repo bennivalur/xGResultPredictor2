@@ -110,7 +110,7 @@ if __name__ == "__main__":
             #get league table
             with open(f'data/{league}/leagueTable.json', 'r') as f:
                 teams = json.load(f)
-            numberOfSimulations = 10000
+            numberOfSimulations = 1000000
             teamPositionsAtEndOfSeason = {t['short_title']: {} for t in teams}
             for t in teams:
                 teamPositionsAtEndOfSeason[t['short_title']] = {i: 0 for i in range(1, len(teams)+1)}

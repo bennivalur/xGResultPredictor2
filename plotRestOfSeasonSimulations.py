@@ -187,5 +187,7 @@ def graphResultsOfSimulation(league, numberOfSimulations):
     draw.text((width // 2, height - 42), footer, fill=(72, 93, 130), anchor="ms", font=footer_font)
     draw.text((28, height - 42), "socksoverpants.com", fill=(72, 93, 130), anchor="ls", font=footer_font)
 
+    #save image with unsharp mask to make it look better
+    #have date in filename  to avoid caching issues when updating the image
     im = im.filter(ImageFilter.UnsharpMask(radius=0.8, percent=140, threshold=2))
-    im.save("images/simResults/" + league + "_resultsOfSeasonSimulation.png", optimize=True)
+    im.save("images/simResults/" + league + "_resultsOfSeasonSimulation_" + str(today) + ".png", optimize=True)
